@@ -19,10 +19,29 @@ def client_receive():
             client.close()
             break
 
+def send_file():
+    while True:
+        filename = input('Input filename you need to send:') 
+        try:
+            
+            fi = open(filename, 'r')
+            data = fi.read() 
+            if not data: 
+                break
+            while data: 
+                client.send(str(data).encode()) 
+                data = fi.read() 
+            fi.close()
+        except IOError:
+            print('Entered filename is invalid')
+
 def client_send():
     while True:
         message = f'{alias}:{input("")}'
-        client.send(message.encode('utf-8'))
+        if message == '1':
+            send_file()
+        else:
+            client.send(message.encode('utf-8'))
 
 receive_thread = threading.Thread(target = client_receive)
 receive_thread.start()

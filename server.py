@@ -10,6 +10,30 @@ server.listen()
 clients = []
 aliases = []
 
+
+def receive_file():
+    fileno = 0
+    idx = 0
+    for client in clients: 
+        idx += 1
+        data = clients[0].recv(1024).decode() 
+        if not data: 
+            continue 
+        filename = 'output'+str(fileno)+'.txt'
+        fileno = fileno+1
+        fo = open(filename, "w") 
+        while data: 
+            if not data: 
+                break
+            else: 
+                fo.write(data) 
+                data = clients[0].recv(1024).decode() 
+        print() 
+        print('Receiving file from client', idx) 
+        print() 
+        print('Received successfully! New filename is:', filename) 
+        fo.close()
+
 def broadcast(message):
     for client in clients:
         client.send(message)
@@ -40,6 +64,7 @@ def receive():
         print(f'The alias of this clients is {alias}'.encode('utf-8'))
         broadcast(f'{alias} has connected to the chat room'.encode('utf-8'))
         client.send('you are now connected to the chat room'.encode('utf-8'))
+        client.send('If you want to send a file enter 1 in chat and after that enter the file name'.encode('utf-8'))
         thread = threading.Thread(target = handle_client, args = (client,))
         thread.start()
     
